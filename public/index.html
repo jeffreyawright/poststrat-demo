@@ -185,11 +185,42 @@
         async function fetchStats() {
             const year = document.getElementById('stats-year').value;
             const output = document.getElementById('stats-output');
-            output.textContent = 'Loading...';
+            output.innerHTML = '<div style="color: #888;">Loading...</div>';
             try {
                 const response = await fetch(`${API_BASE}/stats/${year}`);
                 const data = await response.json();
-                output.textContent = JSON.stringify(data, null, 2);
+
+                if (!data.success) {
+                    output.textContent = JSON.stringify(data, null, 2);
+                    return;
+                }
+
+                // Create formatted display
+                const html = `
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div style="padding: 15px; background: #1a1a2e; border-radius: 8px; border-left: 4px solid #a78bfa;">
+                            <div style="font-size: 14px; color: #888; margin-bottom: 5px;">Year</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #a78bfa;">${data.year}</div>
+                        </div>
+                        <div style="padding: 15px; background: #1a1a2e; border-radius: 8px; border-left: 4px solid #10b981;">
+                            <div style="font-size: 14px; color: #888; margin-bottom: 5px;">Districts</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #10b981;">${data.districtsCount}</div>
+                        </div>
+                        <div style="padding: 15px; background: #1a1a2e; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            <div style="font-size: 14px; color: #888; margin-bottom: 5px;">Total Cells</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">${data.totalCells.toLocaleString()}</div>
+                        </div>
+                        <div style="padding: 15px; background: #1a1a2e; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                            <div style="font-size: 14px; color: #888; margin-bottom: 5px;">Total Population</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">${data.totalPopulation.toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 12px; background: #2d2d44; border-radius: 8px; text-align: center;">
+                        <strong>Average Cells per District:</strong> ${data.averageCellsPerDistrict}
+                    </div>
+                `;
+
+                output.innerHTML = html;
             } catch (error) {
                 output.textContent = `Error: ${error.message}`;
             }
@@ -199,11 +230,68 @@
             const year = document.getElementById('district-year').value;
             const cd = document.getElementById('district-cd').value.toUpperCase();
             const output = document.getElementById('district-output');
-            output.textContent = 'Loading...';
+            output.innerHTML = '<div style="color: #888;">Loading...</div>';
             try {
                 const response = await fetch(`${API_BASE}/district/${year}/${cd}`);
                 const data = await response.json();
-                output.textContent = JSON.stringify(data, null, 2);
+
+                if (!data.success) {
+                    output.textContent = JSON.stringify(data, null, 2);
+                    return;
+                }
+
+                // Create HTML table display
+                let html = `
+                    <div style="margin-bottom: 15px; padding: 15px; background: #1a1a2e; border-radius: 8px;">
+                        <h4 style="margin: 0 0 10px 0; color: #a78bfa;">Summary: ${data.cd} (${data.year})</h4>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                            <div><strong>Total Cells:</strong> ${data.cellCount}</div>
+                            <div><strong>Population:</strong> ${data.totalPopulation.toLocaleString()}</div>
+                            <div><strong>Avg per Cell:</strong> ${Math.round(data.totalPopulation / data.cellCount).toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead>
+                                <tr style="background: #2d2d44; text-align: left;">
+                                    <th style="padding: 8px; border-bottom: 2px solid #a78bfa;">Age Group</th>
+                                    <th style="padding: 8px; border-bottom: 2px solid #a78bfa;">Sex</th>
+                                    <th style="padding: 8px; border-bottom: 2px solid #a78bfa;">Race/Ethnicity</th>
+                                    <th style="padding: 8px; border-bottom: 2px solid #a78bfa;">Education</th>
+                                    <th style="padding: 8px; border-bottom: 2px solid #a78bfa;">Region</th>
+                                    <th style="padding: 8px; border-bottom: 2px solid #a78bfa; text-align: right;">Population</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                // Add first 50 rows
+                const displayCells = data.cells.slice(0, 50);
+                displayCells.forEach((cell, i) => {
+                    const bg = i % 2 === 0 ? '#1a1a2e' : '#16162a';
+                    html += `
+                        <tr style="background: ${bg};">
+                            <td style="padding: 6px;">${cell.ageGroup}</td>
+                            <td style="padding: 6px;">${cell.sex}</td>
+                            <td style="padding: 6px;">${cell.raceEth}</td>
+                            <td style="padding: 6px;">${cell.education}</td>
+                            <td style="padding: 6px;">${cell.censusRegion}</td>
+                            <td style="padding: 6px; text-align: right; font-family: monospace;">${cell.population.toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                if (data.cells.length > 50) {
+                    html += `<div style="margin-top: 10px; color: #888; font-style: italic;">Showing first 50 of ${data.cells.length} cells</div>`;
+                }
+
+                output.innerHTML = html;
             } catch (error) {
                 output.textContent = `Error: ${error.message}`;
             }
