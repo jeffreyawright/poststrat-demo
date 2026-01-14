@@ -68,7 +68,7 @@
                     <select id="stats-year">
                         <option value="2022">2022</option>
                         <option value="2023">2023</option>
-                        <option value="2024">2024</option>
+                        <option value="2024" selected>2024</option>
                     </select>
                     <button onclick="fetchStats()" class="btn btn-primary">Get Statistics</button>
                 </div>
@@ -84,6 +84,7 @@
                     <select id="district-year">
                         <option value="2022">2022</option>
                         <option value="2023">2023</option>
+                        <option value="2024" selected>2024</option>
                     </select>
                     <label for="district-cd">District:</label>
                     <input type="text" id="district-cd" placeholder="TX-32" value="TX-32">
@@ -99,8 +100,9 @@
                 <div class="input-group">
                     <label for="build-year">Year:</label>
                     <select id="build-year">
-                        <option value="2022" selected>2022 (Most Reliable)</option>
+                        <option value="2022">2022</option>
                         <option value="2023">2023</option>
+                        <option value="2024" selected>2024 (Latest)</option>
                     </select>
                     <label for="admin-secret">Admin Secret:</label>
                     <input type="password" id="admin-secret" placeholder="Enter admin secret">
