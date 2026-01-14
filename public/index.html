@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Census Poststratification API - Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Census Poststratification API</h1>
+            <p class="subtitle">Demographic Lookup Tables for MRP Modeling</p>
+        </header>
+
+        <div class="info-box">
+            <h3>What is this?</h3>
+            <p>
+                This API builds poststratification tables from U.S. Census American Community Survey (ACS) 1-year estimates.
+                These tables are used in <strong>Multilevel Regression with Poststratification (MRP)</strong> modeling to
+                make population-level inferences from survey data.
+            </p>
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-label">Age Groups</div>
+                    <div class="stat-value">6</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Sex Categories</div>
+                    <div class="stat-value">2</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Race/Ethnicity</div>
+                    <div class="stat-value">5</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Education Levels</div>
+                    <div class="stat-value">5</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Census Regions</div>
+                    <div class="stat-value">5</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Cells per District</div>
+                    <div class="stat-value">~300</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔍 API Demos</h2>
+
+            <!-- Available Years -->
+            <div class="demo-card">
+                <h3>1. Available ACS Years</h3>
+                <p>Check which years of Census data are available</p>
+                <button onclick="fetchAvailableYears()" class="btn btn-primary">Fetch Available Years</button>
+                <pre id="years-output" class="output"></pre>
+            </div>
+
+            <!-- Table Statistics -->
+            <div class="demo-card">
+                <h3>2. Table Statistics</h3>
+                <p>Get summary statistics for a built table</p>
+                <div class="input-group">
+                    <label for="stats-year">Year:</label>
+                    <select id="stats-year">
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                        <option value="2024">2024</option>
+                    </select>
+                    <button onclick="fetchStats()" class="btn btn-primary">Get Statistics</button>
+                </div>
+                <pre id="stats-output" class="output"></pre>
+            </div>
+
+            <!-- District Lookup -->
+            <div class="demo-card">
+                <h3>3. Congressional District Lookup</h3>
+                <p>Get demographic cells for a specific district</p>
+                <div class="input-group">
+                    <label for="district-year">Year:</label>
+                    <select id="district-year">
+                        <option value="2022">2022</option>
+                        <option value="2023">2023</option>
+                    </select>
+                    <label for="district-cd">District:</label>
+                    <input type="text" id="district-cd" placeholder="TX-32" value="TX-32">
+                    <button onclick="fetchDistrict()" class="btn btn-primary">Fetch District</button>
+                </div>
+                <pre id="district-output" class="output"></pre>
+            </div>
+
+            <!-- Build Table (Admin) -->
+            <div class="demo-card admin-section">
+                <h3>4. Build Table (Admin Only)</h3>
+                <p class="warning">⚠️ This operation takes 15-30 seconds and requires admin credentials</p>
+                <div class="input-group">
+                    <label for="build-year">Year:</label>
+                    <select id="build-year">
+                        <option value="2022" selected>2022 (Most Reliable)</option>
+                        <option value="2023">2023</option>
+                    </select>
+                    <label for="admin-secret">Admin Secret:</label>
+                    <input type="password" id="admin-secret" placeholder="Enter admin secret">
+                    <button onclick="buildTable()" class="btn btn-warning">Build Table</button>
+                </div>
+                <pre id="build-output" class="output"></pre>
+            </div>
+        </div>
+
+        <div class="tech-specs">
+            <h2>🛠️ Technical Specifications</h2>
+            <div class="spec-grid">
+                <div class="spec">
+                    <h4>Age Groups (ANES Convention)</h4>
+                    <ul>
+                        <li>18-24</li>
+                        <li>25-34</li>
+                        <li>35-44</li>
+                        <li>45-54</li>
+                        <li>55-64</li>
+                        <li>65+</li>
+                    </ul>
+                </div>
+                <div class="spec">
+                    <h4>Race/Ethnicity</h4>
+                    <ul>
+                        <li>White (non-Hispanic)</li>
+                        <li>Black (non-Hispanic)</li>
+                        <li>Hispanic</li>
+                        <li>Asian (non-Hispanic)</li>
+                        <li>Other</li>
+                    </ul>
+                </div>
+                <div class="spec">
+                    <h4>Education Levels</h4>
+                    <ul>
+                        <li>Less Than HS</li>
+                        <li>High School</li>
+                        <li>Some College</li>
+                        <li>BA/BS</li>
+                        <li>Post-Grad</li>
+                    </ul>
+                </div>
+                <div class="spec">
+                    <h4>Data Source</h4>
+                    <ul>
+                        <li>Census ACS 1-Year Estimates</li>
+                        <li>Congressional District Level</li>
+                        <li>Tables: B01001, B03002, B15003</li>
+                        <li>Voting Age Population (18+)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with ❤️ by DemographAI</p>
+            <p>
+                <a href="/api/info">API Documentation</a> •
+                <a href="https://github.com/yourusername/poststrat-demo">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function fetchAvailableYears() {
+            const output = document.getElementById('years-output');
+            output.textContent = 'Loading...';
+            try {
+                const response = await fetch(`${API_BASE}/available-years`);
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function fetchStats() {
+            const year = document.getElementById('stats-year').value;
+            const output = document.getElementById('stats-output');
+            output.textContent = 'Loading...';
+            try {
+                const response = await fetch(`${API_BASE}/stats/${year}`);
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function fetchDistrict() {
+            const year = document.getElementById('district-year').value;
+            const cd = document.getElementById('district-cd').value.toUpperCase();
+            const output = document.getElementById('district-output');
+            output.textContent = 'Loading...';
+            try {
+                const response = await fetch(`${API_BASE}/district/${year}/${cd}`);
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function buildTable() {
+            const year = document.getElementById('build-year').value;
+            const adminSecret = document.getElementById('admin-secret').value;
+            const output = document.getElementById('build-output');
+
+            if (!adminSecret) {
+                output.textContent = 'Error: Admin secret required';
+                return;
+            }
+
+            output.textContent = 'Building table... This takes 15-30 seconds...';
+
+            try {
+                const response = await fetch(`${API_BASE}/build/${year}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Admin-Secret': adminSecret,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                output.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Auto-load available years on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchAvailableYears();
+        });
+    </script>
+</body>
+</html>

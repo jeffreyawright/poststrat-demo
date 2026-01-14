@@ -1,0 +1,28 @@
+{
+  "name": "poststrat-demo",
+  "version": "1.0.0",
+  "description": "Census Poststratification Table Builder - Demo API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "deploy": "prisma generate && prisma db push && node server.js"
+  },
+  "keywords": ["census", "poststratification", "mrp", "demographics"],
+  "author": "DemographAI",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

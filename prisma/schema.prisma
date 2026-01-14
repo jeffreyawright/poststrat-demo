@@ -1,0 +1,39 @@
+// Poststratification Table Builder - Minimal Schema
+// This is a standalone demo of Module 10 from RepConnectAI
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Poststratification cells for MRP weighting
+/// Uses ACS 1-year data by Congressional District
+model PoststratCell {
+  id           String @id @default(cuid())
+  year         Int    // ACS year (e.g., 2024, 2023, 2022)
+  state        String // State code (e.g., "TX")
+  cd           String // Congressional district (e.g., "TX-32")
+
+  // Demographic dimensions (ANES/CES convention)
+  ageGroup     String // "18-24", "25-34", "35-44", "45-54", "55-64", "65+"
+  sex          String // "Female", "Male"
+  raceEth      String // "White", "Black", "Hispanic", "Asian", "Other"
+  education    String // "Less Than HS", "High School", "Some College", "BA/BS", "Post-Grad"
+  censusRegion String // "Northeast", "Midwest", "South", "West", "DC"
+
+  // Population count from Census/ACS
+  population Int // Number of people in this cell
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([year, state, cd, ageGroup, sex, raceEth, education, censusRegion])
+  @@index([cd])
+  @@index([state])
+  @@index([year])
+  @@map("poststrat_cells")
+}
